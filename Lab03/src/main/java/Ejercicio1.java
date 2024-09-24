@@ -1,60 +1,78 @@
-import java.util.Timer;
-import java.util.TimerTask;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.Calendar;
 
-public class Ejercicio1 {
+public class Ejercicio1 extends JFrame {
+    private JLabel tiempoLabel;
+    private JTextField alarmaInput;
+    private JButton setAlarmaButton;
+    private Timer timer; 
+    private long alarmaTime;  // Tiempo en milisegundos para la alarma
+    private boolean alarmaActiva = false;
 
-    private final Timer timer;
-    private Timer alarmTimer;
-    private long tiempoConfig;
-    private long alarmaIntervalo;
-    
     public Ejercicio1() {
-        timer = new Timer();
-    }
+        setTitle("Cronómetro con Alarma");
+        setSize(300, 150);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLayout(new GridLayout(3, 1));
 
-    // Método para iniciar el cronómetro
-    public void iniciarCronometro() {
-        TimerTask tareaCronometro = new TimerTask() {
+        // Label para mostrar la hora
+        tiempoLabel = new JLabel("00:00:00", JLabel.CENTER);
+        tiempoLabel.setFont(new Font("Serif", Font.BOLD, 36));
+        add(tiempoLabel);
+
+        // Campo de texto para ingresar la alarma (en segundos)
+        alarmaInput = new JTextField("Ingresa tiempo en segundos");
+        add(alarmaInput);
+
+        // Botón para configurar la alarma
+        setAlarmaButton = new JButton("Configurar Alarma");
+        add(setAlarmaButton);
+
+        // Acción del botón de configurar alarma
+        setAlarmaButton.addActionListener(new ActionListener() {
             @Override
-            public void run() {
-                SimpleDateFormat formatoHora = new SimpleDateFormat("HH:mm:ss");
-                String horaActual = formatoHora.format(new Date());
-                System.out.println("Hora Actual: " + horaActual);
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    int tiempoEnSegundos = Integer.parseInt(alarmaInput.getText());
+                    alarmaTime = System.currentTimeMillis() + (tiempoEnSegundos * 1000);
+                    alarmaActiva = true;
+                    JOptionPane.showMessageDialog(null, "Alarma configurada para " + tiempoEnSegundos + " segundos.");
+                } catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(null, "Por favor ingresa un número válido.");
+                }
             }
-        };
-        timer.scheduleAtFixedRate(tareaCronometro, 0, 1000); // Ejecuta cada segundo
-    }
+        });
 
-    // Método para configurar el tiempo y la alarma
-    public void configurarAlarma(long minutos, long intervaloAlarmaSegundos) {
-        tiempoConfig = minutos * 60 * 1000; // Convertir minutos a milisegundos
-        alarmaIntervalo = intervaloAlarmaSegundos * 1000; // Convertir segundos a milisegundos
-
-        TimerTask tareaAlarma = new TimerTask() {
+        // Timer para actualizar la hora cada segundo
+        timer = new Timer(1000, new ActionListener() {
             @Override
-            public void run() {
-                System.out.println("¡Alarma!");
+            public void actionPerformed(ActionEvent e) {
+                actualizarTiempo();
             }
-        };
-
-        // Configurar el Timer para la alarma
-        alarmTimer = new Timer();
-        alarmTimer.schedule(tareaAlarma, tiempoConfig, alarmaIntervalo);
+        });
+        timer.start();
     }
 
-    // Método para detener el cronómetro y la alarma
-    public void detenerCronometro() {
-        timer.cancel();
-        if (alarmTimer != null) {
-            alarmTimer.cancel();
+    // Método para actualizar la hora
+    private void actualizarTiempo() {
+        SimpleDateFormat formato = new SimpleDateFormat("HH:mm:ss");
+        String horaActual = formato.format(Calendar.getInstance().getTime());
+        tiempoLabel.setText(horaActual);
+
+        // Verificar si la alarma debe sonar
+        if (alarmaActiva && System.currentTimeMillis() >= alarmaTime) {
+            JOptionPane.showMessageDialog(this, "¡Alarma!");
+            alarmaActiva = false;  // Desactiva la alarma después de sonar
         }
     }
 
     public static void main(String[] args) {
-        Ejercicio1 ejercicio1 = new Ejercicio1();
-        ejercicio1.iniciarCronometro();
-        ejercicio1.configurarAlarma(2, 10); // Configura alarma para 2 minutos y alarma cada 10 segundos
+        SwingUtilities.invokeLater(() -> {
+            new Ejercicio1().setVisible(true);
+        });
     }
 }
