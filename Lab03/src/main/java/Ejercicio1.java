@@ -10,29 +10,29 @@ public class Ejercicio1 extends JFrame {
     private JTextField alarmaInput;
     private JButton setAlarmaButton;
     private Timer timer; 
-    private long alarmaTime;  // Tiempo en milisegundos para la alarma
+    private long alarmaTime;
     private boolean alarmaActiva = false;
-
+    
     public Ejercicio1() {
         setTitle("Cronómetro con Alarma");
-        setSize(300, 150);
+        setSize(400, 300);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new GridLayout(3, 1));
-
-        // Label para mostrar la hora
+       
         tiempoLabel = new JLabel("00:00:00", JLabel.CENTER);
-        tiempoLabel.setFont(new Font("Serif", Font.BOLD, 36));
+        tiempoLabel.setFont(new Font("Times New Roman", Font.BOLD, 65));
         add(tiempoLabel);
-
-        // Campo de texto para ingresar la alarma (en segundos)
-        alarmaInput = new JTextField("Ingresa tiempo en segundos");
+        
+        alarmaInput = new JTextField("");
+        alarmaInput.setFont(new Font("Times New Roman", Font.PLAIN, 40));
         add(alarmaInput);
-
-        // Botón para configurar la alarma
-        setAlarmaButton = new JButton("Configurar Alarma");
+        
+        setAlarmaButton = new JButton("Configurar Alarma (seg)");
+        setAlarmaButton.setFont(new Font("Times New Roman", Font.BOLD, 30));
         add(setAlarmaButton);
-
-        // Acción del botón de configurar alarma
+        
+        setAlarmaButton.setBackground(new Color(255, 182, 193));
+        
         setAlarmaButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -46,8 +46,7 @@ public class Ejercicio1 extends JFrame {
                 }
             }
         });
-
-        // Timer para actualizar la hora cada segundo
+        
         timer = new Timer(1000, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -56,20 +55,17 @@ public class Ejercicio1 extends JFrame {
         });
         timer.start();
     }
-
-    // Método para actualizar la hora
+    
     private void actualizarTiempo() {
         SimpleDateFormat formato = new SimpleDateFormat("HH:mm:ss");
         String horaActual = formato.format(Calendar.getInstance().getTime());
         tiempoLabel.setText(horaActual);
-
-        // Verificar si la alarma debe sonar
+        
         if (alarmaActiva && System.currentTimeMillis() >= alarmaTime) {
             JOptionPane.showMessageDialog(this, "¡Alarma!");
-            alarmaActiva = false;  // Desactiva la alarma después de sonar
+            alarmaActiva = false;
         }
     }
-
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             new Ejercicio1().setVisible(true);
